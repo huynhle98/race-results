@@ -3,8 +3,6 @@ import path from "path";
 import PingController from "../controllers/ping";
 import CrawlDataController from "../controllers/crawl-data";
 import RaceController from "../controllers/raceController";
-import { Get, Response } from "tsoa";
-import url from 'url';
 
 const router = express.Router();
 
@@ -24,10 +22,8 @@ router.get("/races", async (_req, res) => {
   }
 });
 
-router.get("/races/:year", async (_req, res) => {
+router.get("/races/grand/:year", async (_req, res) => {
   const controller = new RaceController();
-  const url_parts = url.parse(_req.url, true);
-  // const query = url_parts.query;
   const response = await controller.getRacesWithGrand(_req, _req.query['year'] as string, _req.query['grand'] as string);
   if (response) {
     return res.send(response);

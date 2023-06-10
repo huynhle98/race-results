@@ -1,7 +1,7 @@
 {
   "name": "race-results",
   "version": "1.0.0",
-  "description": "",
+  "description": "Documenting a REST API for RACE RESULTS",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
