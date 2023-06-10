@@ -10,7 +10,7 @@ const client = new MongoClient(uri, {
 });
 
 
-export const collections: { races?: Collection } = {}
+export const collections: { races?: Collection, drivers?: Collection } = {}
 
 export async function connectToDatabase() {
   await client.connect();
@@ -18,4 +18,7 @@ export async function connectToDatabase() {
   const racesCollection: Collection = db.collection('races');
   collections.races = racesCollection;
   console.log(`Successfully connected to database: ${db.databaseName} and collection: ${racesCollection.collectionName}`);
+  const driversCollection: Collection = db.collection('drivers');
+  collections.drivers = driversCollection;
+  console.log(`Successfully connected to collection: ${driversCollection.collectionName}`);
 }

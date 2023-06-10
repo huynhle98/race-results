@@ -3,16 +3,22 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import Race from '../models/race';
 import { collections } from "../services/database.service";
+import Driver from '../models/driver';
 
 export default class CrawlDataController {
   public async setCrawlData(): Promise<any> {
-    let races: Race[] = [
+    let races: Array<Race> = [
       ...await this.getRacesData(2023),
       ...await this.getRacesData(2022)];
+    let drivers: Array<Driver> = [
+      ...await this.getDriversData(2023),
+      ...await this.getDriversData(2022)];
     console.log("Crawling data successfully");
     try {
-      await this.saveDataToDB(races);
-      console.log("Save data to DB successfully");
+      await this.saveDataToDB(races, 'races');
+      console.log("Save races data to DB successfully");
+      await this.saveDataToDB(drivers, 'drivers');
+      console.log("Save drivers data to DB successfully");
       return {
         message: "Crawling data successfully",
       };
@@ -22,11 +28,48 @@ export default class CrawlDataController {
     }
   }
 
-  async saveDataToDB(data: any) {
+  async saveDataToDB(data: any, collectionName: string) {
     for (const item of data) {
-      const exist = await collections.races?.findOne(item);
-      exist ? await collections.races?.updateOne({}, { $set: item }) : await collections.races?.insertOne(item);
+      switch (collectionName) {
+        case 'races':
+          const racesResult = await collections.races?.findOne(item);
+          racesResult ? await collections.races?.updateOne({}, { $set: item }) : await collections.races?.insertOne(item);
+          break;
+        case 'drivers':
+          const driversResult = await collections.drivers?.findOne(item);
+          driversResult ? await collections.drivers?.updateOne({}, { $set: item }) : await collections.drivers?.insertOne(item);
+          break;
+        default:
+          break;
+      }
     }
+  }
+
+  async getDriversData(year: number) {
+    const url = `https://www.formula1.com/en/results.html/${year}/drivers.html`;
+    const drivers: Array<Driver> = [];
+    const response = await axios.get(url);
+    const html = response.data;
+    const $ = cheerio.load(html);
+    const positions = $('.resultsarchive-table tbody td:nth-child(2)').get();
+    const drivers1 = $('.resultsarchive-table tbody td:nth-child(3) span:nth-child(1)').get();
+    const drivers2 = $('.resultsarchive-table tbody td:nth-child(3) span:nth-child(2)').get();
+    const nationalities = $('.resultsarchive-table tbody td:nth-child(5)').get();
+    const cars = $('.resultsarchive-table tbody td:nth-child(5)').get();
+    const points = $('.resultsarchive-table tbody td:nth-child(6)').get();
+    positions.forEach((pos, index) => {
+      console.log("Crawling data");
+      const driver: Driver = {
+        position: parseInt($(pos).text().trim()),
+        nationality: $(nationalities[index]).text().trim(),
+        year: year,
+        driver: $(drivers1[index]).text().trim() + ' ' + $(drivers2[index]).text().trim(),
+        car: $(cars[index]).text().trim(),
+        points: parseInt($(points[index]).text().trim())
+      }
+      drivers.push(driver);
+    })
+    return drivers;
   }
 
   async getRacesData(year: number) {
@@ -46,8 +89,8 @@ export default class CrawlDataController {
         const times = $('.resultsarchive-table tbody td:nth-child(7)').get();
         const points = $('.resultsarchive-table tbody td:nth-child(8)').get();
         const date = $('.date .full-date').get();
-        console.log("Crawling data");
         positions.forEach((pos, index) => {
+          console.log("Crawling data");
           const race: Race = {
             year: year,
             grandFrix: val.value,
