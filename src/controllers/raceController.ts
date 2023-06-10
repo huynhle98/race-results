@@ -27,4 +27,19 @@ export default class RaceController {
     }
     return (await collections.races?.find({ year: parseInt(request.params.year), position: "1" }).toArray()) as Array<IRace>;
   }
+
+  @Response(404, "Not Found")
+  @Get("/driver/{year}")
+  public async getRacesWithDriver(
+    @Request() request: express.Request,
+    @Path() year: string,
+    @Query() driver?: string,
+  ): Promise<Array<IRace>> {
+    const regex = new RegExp(["^", driver, "$"].join(""), "i");
+    console.log(driver)
+    if (driver) {
+      return (await collections.races?.find({ year: parseInt(request.params.year), driver: regex }).toArray()) as Array<IRace>;
+    }
+    return (await collections.drivers?.find({ year: parseInt(request.params.year) }).toArray()) as Array<IRace>;
+  }
 }

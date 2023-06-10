@@ -32,6 +32,18 @@ router.get("/races/grand/:year", async (_req, res) => {
   }
 });
 
+router.get("/races/driver/:year", async (_req, res) => {
+  const controller = new RaceController();
+  // const url_parts = url.parse(_req.url, true);
+  // const query = url_parts.query;
+  const response = await controller.getRacesWithDriver(_req, _req.query['year'] as string, _req.query['driver'] as string);
+  if (response) {
+    return res.send(response);
+  } else {
+    return res.status(500).send('error');
+  }
+});
+
 router.get("/crawl-data", async (_req, res) => {
 
   return res.sendFile(path.join(__dirname, '/crawl/crawler.html'));
