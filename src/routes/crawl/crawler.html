@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Sample Site</title>
+  <title>Crawl data</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <style>
@@ -17,51 +17,33 @@
 
   <div class="container">
     <div class="jumbotron">
-      <input type="text" id="urlCrawl">
-      <button onclick="onCrawling()">Click</button>
+      <!-- <input type="text" id="urlCrawl"> -->
+      <button onclick="onCrawling()" id="crawlBtn">Crawl data</button>
     </div>
   </div>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-  <!-- <script src="/cheerio/index.js"></script> -->
   <script>
 
     async function onCrawling() {
-      // var cheerio = require('cheerio');
-
-      console.log(document.getElementById('urlCrawl')?.value);
       const url = 'https://www.formula1.com/en/results.html/2023/races.html';
       const response = await axios.get(url);
       const html = response.data;
+      const btnEl = document.getElementById("crawlBtn");
+      btnEl.disabled = true;
+      btnEl.textContent = "Crawling";
       axios.post(window.location.origin + '/crawl-data', {
         url: url
       })
         .then(function (response) {
           console.log(response);
+          btnEl.disabled = false;
+          btnEl.textContent = "Crawl data";
         })
         .catch(function (error) {
           console.log(error);
+          btnEl.disabled = false;
+          btnEl.textContent = "Crawl data";
         });
-      // $.ajax({
-      //   url: window.location.origin + '/crawl-data',
-      //   headers: {
-      //     'Content-Type': 'application/x-www-form-urlencoded'
-      //   },
-      //   type: "POST", /* or type:"GET" or type:"PUT" */
-      //   dataType: "json",
-      //   data: {
-      //     url: url
-      //   },
-      //   success: function (result) {
-      //     console.log(result);
-      //   },
-      //   error: function () {
-      //     console.log("error");
-      //   }
-      // });
-
-      // const $ = cheerio.load(html);
-      // console.log($)
     }
   </script>
 </body>

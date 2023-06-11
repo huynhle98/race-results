@@ -10,13 +10,22 @@ export default class CrawlDataController {
   public async setCrawlData(): Promise<any> {
     let races: Array<Race> = [
       ...await this.getRacesData(2023),
-      ...await this.getRacesData(2022)];
+      ...await this.getRacesData(2022),
+      ...await this.getRacesData(2021),
+      ...await this.getRacesData(2020),
+      ...await this.getRacesData(2019)];
     let drivers: Array<Driver> = [
       ...await this.getDriversData(2023),
-      ...await this.getDriversData(2022)];
+      ...await this.getDriversData(2022),
+      ...await this.getDriversData(2021),
+      ...await this.getDriversData(2020),
+      ...await this.getDriversData(2019)];
     let teams: Array<Team> = [
       ...await this.getTeamsData(2023),
-      ...await this.getTeamsData(2022)];
+      ...await this.getTeamsData(2022),
+      ...await this.getTeamsData(2021),
+      ...await this.getTeamsData(2020),
+      ...await this.getTeamsData(2019)];
     console.log("Crawling data successfully");
     try {
       await this.saveDataToDB(races, 'races');
@@ -57,7 +66,6 @@ export default class CrawlDataController {
 
   async getTeamsData(year: number) {
     const urlList = await this.getUrlForTeam(year);
-    console.log(urlList)
     const teams: Array<Team> = [];
     for (const val of urlList) {
       if (val?.url) {
