@@ -1,0 +1,486 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"ObjectId": {
+				"type": "string",
+				"description": "A class representation of the BSON ObjectId type."
+			},
+			"IRace": {
+				"properties": {
+					"position": {
+						"type": "string"
+					},
+					"no": {
+						"type": "number",
+						"format": "double"
+					},
+					"year": {
+						"type": "number",
+						"format": "double"
+					},
+					"grandFrix": {
+						"type": "string"
+					},
+					"driver": {
+						"type": "string"
+					},
+					"date": {
+						"type": "string"
+					},
+					"car": {
+						"type": "string"
+					},
+					"laps": {
+						"type": "number",
+						"format": "double"
+					},
+					"time": {
+						"type": "string"
+					},
+					"points": {
+						"type": "number",
+						"format": "double"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/ObjectId"
+					}
+				},
+				"required": [
+					"position",
+					"no",
+					"year",
+					"grandFrix",
+					"driver",
+					"date",
+					"car",
+					"laps",
+					"time",
+					"points"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IDriver": {
+				"properties": {
+					"position": {
+						"type": "number",
+						"format": "double"
+					},
+					"nationality": {
+						"type": "string"
+					},
+					"year": {
+						"type": "number",
+						"format": "double"
+					},
+					"driver": {
+						"type": "string"
+					},
+					"car": {
+						"type": "string"
+					},
+					"points": {
+						"type": "number",
+						"format": "double"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/ObjectId"
+					}
+				},
+				"required": [
+					"position",
+					"nationality",
+					"year",
+					"driver",
+					"car",
+					"points"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ITeam": {
+				"properties": {
+					"team": {
+						"type": "string"
+					},
+					"grandFri": {
+						"type": "string"
+					},
+					"year": {
+						"type": "number",
+						"format": "double"
+					},
+					"date": {
+						"type": "string"
+					},
+					"position": {
+						"type": "number",
+						"format": "double"
+					},
+					"points": {
+						"type": "number",
+						"format": "double"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/ObjectId"
+					}
+				},
+				"required": [
+					"team",
+					"grandFri",
+					"year",
+					"date",
+					"points"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ITeamGroup": {
+				"properties": {
+					"team": {
+						"type": "string"
+					},
+					"year": {
+						"type": "number",
+						"format": "double"
+					},
+					"position": {
+						"type": "number",
+						"format": "double"
+					},
+					"points": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"team",
+					"year",
+					"points"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "race-results",
+		"version": "1.0.0",
+		"description": "Documenting a REST API for RACE RESULTS",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/races/{year}": {
+			"get": {
+				"operationId": "GetDataByYear",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/IRace"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"tags": [
+					"Search data by year"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "year",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/races/drivername/{driver}": {
+			"get": {
+				"operationId": "GetDataByDriver",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/IRace"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"tags": [
+					"Search data by driver"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "driver",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/races/teamname/{team}": {
+			"get": {
+				"operationId": "GetDataByTeam",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/IRace"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"tags": [
+					"Search data by team"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "team",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/races/race/{race}": {
+			"get": {
+				"operationId": "GetDataByRace",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/IRace"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"tags": [
+					"Search data by race"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "race",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/races/grand/{year}": {
+			"get": {
+				"operationId": "GetRacesWithGrand",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/IRace"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"tags": [
+					"Race results by Year & Grand Frix(optional)"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "year",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "grand",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/races/driver/{year}": {
+			"get": {
+				"operationId": "GetRacesWithDriver",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IRace"
+											},
+											{
+												"$ref": "#/components/schemas/IDriver"
+											}
+										]
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"tags": [
+					"Race results by Year & Driver(optional)"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "year",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "driver",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/races/team/{year}": {
+			"get": {
+				"operationId": "GetRacesWithTeam",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/ITeam"
+											},
+											{
+												"$ref": "#/components/schemas/ITeamGroup"
+											}
+										]
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"tags": [
+					"Race results by Year & Team(optional)"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "year",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "team",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

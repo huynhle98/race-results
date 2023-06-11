@@ -1,16 +1,9 @@
 import express from "express";
 import path from "path";
-import PingController from "../controllers/ping";
 import CrawlDataController from "../controllers/crawl-data";
 import RaceController from "../controllers/raceController";
 
 const router = express.Router();
-
-router.get("/ping", async (_req, res) => {
-  const controller = new PingController();
-  const response = await controller.getMessage();
-  return res.send(response);
-});
 
 router.get("/races", async (_req, res) => {
   const controller = new RaceController();
