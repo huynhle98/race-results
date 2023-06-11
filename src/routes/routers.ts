@@ -34,9 +34,17 @@ router.get("/races/grand/:year", async (_req, res) => {
 
 router.get("/races/driver/:year", async (_req, res) => {
   const controller = new RaceController();
-  // const url_parts = url.parse(_req.url, true);
-  // const query = url_parts.query;
   const response = await controller.getRacesWithDriver(_req, _req.query['year'] as string, _req.query['driver'] as string);
+  if (response) {
+    return res.send(response);
+  } else {
+    return res.status(500).send('error');
+  }
+});
+
+router.get("/races/team/:year", async (_req, res) => {
+  const controller = new RaceController();
+  const response = await controller.getRacesWithTeam(_req, _req.query['year'] as string, _req.query['team'] as string);
   if (response) {
     return res.send(response);
   } else {

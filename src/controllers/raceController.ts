@@ -1,7 +1,10 @@
 import { Get, Route, Response, Tags, Request, Query, FormField, Queries, Path } from "tsoa";
+import express from 'express';
+
 import { IRace } from "../models/race";
 import { collections } from "../services/database.service";
-import express from 'express';
+import { IDriver } from "../models/driver";
+import { ITeam, ITeamGroup } from "../models/team";
 
 @Route("races")
 @Tags("Races")
@@ -34,12 +37,48 @@ export default class RaceController {
     @Request() request: express.Request,
     @Path() year: string,
     @Query() driver?: string,
-  ): Promise<Array<IRace>> {
+  ): Promise<Array<IRace | IDriver>> {
     const regex = new RegExp(["^", driver, "$"].join(""), "i");
-    console.log(driver)
     if (driver) {
       return (await collections.races?.find({ year: parseInt(request.params.year), driver: regex }).toArray()) as Array<IRace>;
     }
-    return (await collections.drivers?.find({ year: parseInt(request.params.year) }).toArray()) as Array<IRace>;
+    return (await collections.drivers?.find({ year: parseInt(request.params.year) }).toArray()) as Array<IDriver>;
+  }
+
+  @Response(404, "Not Found")
+  @Get("/team/{year}")
+  public async getRacesWithTeam(
+    @Request() request: express.Request,
+    @Path() year: string,
+    @Query() team?: string,
+  ): Promise<Array<ITeam | ITeamGroup>> {
+    const regex = new RegExp(["^", team, "$"].join(""), "i");
+    if (team) {
+      return (await collections.teams?.find({ year: parseInt(request.params.year), team: regex }).toArray()) as Array<ITeam>;
+    }
+    const teamList = (await collections.teams?.find({ year: parseInt(request.params.year) }).toArray()) as Array<ITeam>;
+    let teamGroups: Array<ITeamGroup> = [];
+    for (const [index, team] of teamList.entries()) {
+      if (index === 0) {
+        teamGroups.push({
+          team: team.team,
+          year: team.year,
+          points: team.points
+        });
+      } else {
+        const index = teamGroups.findIndex(teamGr => teamGr.team === team.team)
+        if (index !== -1) {
+          teamGroups[index].points += team.points;
+        } else {
+          teamGroups.push({
+            team: team.team,
+            year: team.year,
+            points: team.points
+          });
+        }
+      }
+    }
+    teamGroups = (teamGroups.sort((a, b) => b.points - a.points)).map((teamGr, index) => ({ ...teamGr, position: index + 1 }))
+    return teamGroups;
   }
 }
