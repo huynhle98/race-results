@@ -4,6 +4,7 @@ import * as cheerio from 'cheerio';
 import Race from '../models/race';
 import { collections } from "../services/database.service";
 import Driver from '../models/driver';
+import Team from '../models/team';
 
 export default class CrawlDataController {
   public async setCrawlData(): Promise<any> {
@@ -13,12 +14,17 @@ export default class CrawlDataController {
     let drivers: Array<Driver> = [
       ...await this.getDriversData(2023),
       ...await this.getDriversData(2022)];
+    let teams: Array<Team> = [
+      ...await this.getTeamsData(2023),
+      ...await this.getTeamsData(2022)];
     console.log("Crawling data successfully");
     try {
       await this.saveDataToDB(races, 'races');
       console.log("Save races data to DB successfully");
       await this.saveDataToDB(drivers, 'drivers');
       console.log("Save drivers data to DB successfully");
+      await this.saveDataToDB(teams, 'teams');
+      console.log("Save teams data to DB successfully");
       return {
         message: "Crawling data successfully",
       };
@@ -39,10 +45,64 @@ export default class CrawlDataController {
           const driversResult = await collections.drivers?.findOne(item);
           driversResult ? await collections.drivers?.updateOne({}, { $set: item }) : await collections.drivers?.insertOne(item);
           break;
+        case 'teams':
+          const teamsResult = await collections.teams?.findOne({ year: item.year, team: item.team, grandFrix: item.grandFrix });
+          teamsResult ? await collections.teams?.updateOne({}, { $set: item }) : await collections.teams?.insertOne(item);
+          break;
         default:
           break;
       }
     }
+  }
+
+  async getTeamsData(year: number) {
+    const urlList = await this.getUrlForTeam(year);
+    console.log(urlList)
+    const teams: Array<Team> = [];
+    for (const val of urlList) {
+      if (val?.url) {
+        const response = await axios.get(val.url);
+        const html = response.data;
+        const $ = cheerio.load(html);
+        const grands = $('.resultsarchive-table tbody td:nth-child(2) > a').get();
+        const dates = $('.resultsarchive-table tbody td:nth-child(3)').get();
+        const points = $('.resultsarchive-table tbody td:nth-child(4)').get();
+        grands.forEach((value, index) => {
+          console.log("Crawling data");
+          const team: Team = {
+            year: year,
+            team: val.value,
+            grandFrix: $(grands[index]).text().trim(),
+            date: $(dates[index]).text().trim(),
+            points: parseInt($(points[index]).text().trim()),
+          }
+          teams.push(team);
+        })
+      }
+    }
+    return teams;
+  }
+
+  async getUrlForTeam(year: number) {
+    const allUrl = `https://www.formula1.com/en/results.html/${year}/team.html`;
+    const responseAll = await axios.get(allUrl);
+    const html = responseAll.data;
+    const $ = cheerio.load(html);
+    const urls = $('li.resultsarchive-filter-item > a[data-name="teamKey"]').get();
+    let urlList = urls.map(url => $(url).attr('data-value'));
+    urlList = urlList.filter(url => url !== 'all');
+
+    const values = $('li.resultsarchive-filter-item > a[data-name="teamKey"] > span').get();
+    let valueList = values.map(val => $(val).text().trim());
+
+    valueList = valueList.filter(val => val !== 'All');
+    const finalList = urlList.map((url, index) => {
+      return {
+        url: `https://www.formula1.com/en/results.html/${year}/team/${url}.html`,
+        value: valueList[index]
+      };
+    });
+    return finalList;
   }
 
   async getDriversData(year: number) {
@@ -74,7 +134,7 @@ export default class CrawlDataController {
 
   async getRacesData(year: number) {
     const urlList = await this.getUrlForGrand(year);
-    const races: Race[] = [];
+    const races: Array<Race> = [];
     for (const val of urlList) {
       if (val?.url) {
         const response = await axios.get(val.url);
@@ -117,7 +177,7 @@ export default class CrawlDataController {
     const $ = cheerio.load(html);
     const urls = $('li.resultsarchive-filter-item > a[data-name="meetingKey"]').get();
     let urlList = urls.map(url => $(url).attr('data-value'));
-    urlList = urlList.filter(url => url);
+    urlList = urlList.filter(url => url !== 'all');
 
     const values = $('li.resultsarchive-filter-item > a[data-name="meetingKey"] > span').get();
     let valueList = values.map(val => $(val).text().trim());
