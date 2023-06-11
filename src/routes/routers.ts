@@ -22,6 +22,26 @@ router.get("/races", async (_req, res) => {
   }
 });
 
+router.get("/races/:year", async (_req, res) => {
+  const controller = new RaceController();
+  const response = await controller.getDataByYear(_req, _req.params['year'] as string);
+  if (response) {
+    return res.send(response);
+  } else {
+    return res.status(500).send('error');
+  }
+});
+
+router.get("/races/drivername/:driver", async (_req, res) => {
+  const controller = new RaceController();
+  const response = await controller.getDataByDriver(_req, _req.params['driver'] as string);
+  if (response) {
+    return res.send(response);
+  } else {
+    return res.status(500).send('error');
+  }
+});
+
 router.get("/races/grand/:year", async (_req, res) => {
   const controller = new RaceController();
   const response = await controller.getRacesWithGrand(_req, _req.query['year'] as string, _req.query['grand'] as string);

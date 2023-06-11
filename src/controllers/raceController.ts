@@ -7,7 +7,7 @@ import { IDriver } from "../models/driver";
 import { ITeam, ITeamGroup } from "../models/team";
 
 @Route("races")
-@Tags("Races")
+// @Tags("Races")
 export default class RaceController {
   @Response(404, "Not Found")
   // @Get("/all")
@@ -16,7 +16,28 @@ export default class RaceController {
     return racesData;
   }
 
-  @Tags("Race results - Grand Frix")
+  @Tags("Search data by year")
+  @Response(404, "Not Found")
+  @Get("/{year}")
+  public async getDataByYear(
+    @Request() request: express.Request,
+    @Path() year: string
+  ): Promise<Array<IRace>> {
+    return (await collections.races?.find({ year: parseInt(request.params.year) }).toArray()) as Array<IRace>;
+  }
+
+  @Tags("Search data by driver")
+  @Response(404, "Not Found")
+  @Get("/drivername/{driver}")
+  public async getDataByDriver(
+    @Request() request: express.Request,
+    @Path() driver: string
+  ): Promise<Array<IRace>> {
+    const regex = new RegExp(["^", request.params.driver, "$"].join(""), "i");
+    return (await collections.races?.find({ driver: regex }).toArray()) as Array<IRace>;
+  }
+
+  @Tags("Race results by Year & Grand Frix(optional)")
   @Response(404, "Not Found")
   @Get("/grand/{year}")
   public async getRacesWithGrand(
@@ -31,6 +52,7 @@ export default class RaceController {
     return (await collections.races?.find({ year: parseInt(request.params.year), position: "1" }).toArray()) as Array<IRace>;
   }
 
+  @Tags("Race results by Year & Driver(optional)")
   @Response(404, "Not Found")
   @Get("/driver/{year}")
   public async getRacesWithDriver(
@@ -45,6 +67,7 @@ export default class RaceController {
     return (await collections.drivers?.find({ year: parseInt(request.params.year) }).toArray()) as Array<IDriver>;
   }
 
+  @Tags("Race results by Year & Team(optional)")
   @Response(404, "Not Found")
   @Get("/team/{year}")
   public async getRacesWithTeam(
