@@ -37,6 +37,17 @@ export default class RaceController {
     return (await collections.races?.find({ driver: regex }).toArray()) as Array<IRace>;
   }
 
+  @Tags("Search data by team")
+  @Response(404, "Not Found")
+  @Get("/teamname/{team}")
+  public async getDataByTeam(
+    @Request() request: express.Request,
+    @Path() team: string
+  ): Promise<Array<IRace>> {
+    const regex = new RegExp(["^", request.params.team, "$"].join(""), "i");
+    return (await collections.races?.find({ car: regex }).toArray()) as Array<IRace>;
+  }
+
   @Tags("Race results by Year & Grand Frix(optional)")
   @Response(404, "Not Found")
   @Get("/grand/{year}")
