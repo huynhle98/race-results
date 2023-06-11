@@ -48,6 +48,17 @@ export default class RaceController {
     return (await collections.races?.find({ car: regex }).toArray()) as Array<IRace>;
   }
 
+  @Tags("Search data by race")
+  @Response(404, "Not Found")
+  @Get("/race/{race}")
+  public async getDataByRace(
+    @Request() request: express.Request,
+    @Path() race: string
+  ): Promise<Array<IRace>> {
+    const regex = new RegExp(["^", request.params.race, "$"].join(""), "i");
+    return (await collections.races?.find({ grandFrix: regex }).toArray()) as Array<IRace>;
+  }
+
   @Tags("Race results by Year & Grand Frix(optional)")
   @Response(404, "Not Found")
   @Get("/grand/{year}")

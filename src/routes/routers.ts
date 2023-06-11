@@ -52,6 +52,16 @@ router.get("/races/teamname/:team", async (_req, res) => {
   }
 });
 
+router.get("/races/race/:race", async (_req, res) => {
+  const controller = new RaceController();
+  const response = await controller.getDataByRace(_req, _req.params['race'] as string);
+  if (response) {
+    return res.send(response);
+  } else {
+    return res.status(500).send('error');
+  }
+});
+
 router.get("/races/grand/:year", async (_req, res) => {
   const controller = new RaceController();
   const response = await controller.getRacesWithGrand(_req, _req.query['year'] as string, _req.query['grand'] as string);
